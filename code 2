@@ -1,0 +1,74 @@
+#include "Timer.h"
+
+
+Timer t;
+ 
+int led_pin = D7;
+int D0_Value = D8;
+int raw_Value = A0;
+
+
+int LED_State = 0;
+int clap_counter = 0;
+int Set_point = 120; //This is the value obtained from step 2
+
+
+void setup(){
+  Serial.begin(9600);
+  pinMode(D0_Value, OUTPUT); // Set pin D8 as digital output
+  pinMode(raw_Value, INPUT); //Set pin A0 as an input
+
+
+  t.every(2000, Reset_Clap_counter);
+ //Programed to call the function to reset clap counter every 2 seconds
+
+
+}
+
+
+void loop(){
+  int val_digital = digitalRead(D0_Value);
+  int val_analog = analogRead(raw_Value );
+
+
+
+
+//This is optional. No need to show the values again
+  Serial.print(val_analog);
+  Serial.print("\t");
+  Serial.println(val_digital);
+
+
+  digitalWrite (led_pin, LED_State); //Variable LED_State commands the state of the LED
+
+
+//Remember that the counter is running. After 2 second it will reset the Clap_counter
+//So the claps must be done rapidly
+
+
+  if(val_analog > Set_point){
+    clap_counter ++;
+
+
+      if (clap_counter == 2){
+        LED_State = !LED_State;
+        }
+  }
+//------------------------------------------------------------------------------------
+//This setpoint came from the adjustment of the potenciometer.
+//Can be interpreted like a sound limiar. Ths is optional and it is 
+//just a way for us to use this functionality
+
+
+  if (val_digital){
+    Serial.print("The room is very noisy");
+    delay(500);
+    }
+}
+
+
+//Function to reset counter every 2 second
+void Reset_Clap_counter()
+{
+  clap_counter = 0;
+}
